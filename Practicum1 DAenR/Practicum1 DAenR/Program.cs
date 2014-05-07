@@ -41,34 +41,5 @@ namespace Practicum1_DAenR
             dbObject.Close();
             Console.ReadLine();
         }
-
-        static void testdb()
-        {
-            SQLiteConnection.CreateFile("cars.sqlite");
-            dbObject = new SQLiteConnection("Data Source=test.sqlite; Version=3;");
-            dbObject.Open();
-            string invoer1 = ("CREATE TABLE aantalaardigheidspunten (name VARCHAR(20), score INT)");
-            SQLiteCommand opdracht = new SQLiteCommand(invoer1, dbObject);
-            opdracht.ExecuteNonQuery();
-            string invoer2 = "insert into aantalaardigheidspunten (name, score) values ('Gerben', 12)";
-            SQLiteCommand command = new SQLiteCommand(invoer2, dbObject);
-            command.ExecuteNonQuery();
-            invoer2 = "insert into aantalaardigheidspunten (name, score) values ('Gurbo', 3)";
-            command = new SQLiteCommand(invoer2, dbObject);
-            command.ExecuteNonQuery();
-            invoer2 = "insert into aantalaardigheidspunten (name, score) values ('Sammie', 345673)";
-            command = new SQLiteCommand(invoer2, dbObject);
-            command.ExecuteNonQuery();
-            string tijdelijkeuitvoer = "select * from aantalaardigheidspunten order by score desc";
-            SQLiteCommand commando = new SQLiteCommand(tijdelijkeuitvoer, dbObject);
-            SQLiteDataReader reader = commando.ExecuteReader();
-            while (reader.Read())
-                Console.WriteLine("Name: " + reader["name"] + "\tScore: " + reader["score"]);
-
-
-            dbObject.Close();
-            Console.ReadLine();
-
-        }
     }
 }
