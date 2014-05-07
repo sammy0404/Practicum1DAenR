@@ -1,0 +1,109 @@
+%% Werkplan verslag van Gerben en Sam
+	
+
+\documentclass[a4paper]{article}
+
+\usepackage[dutch]{babel} 
+\usepackage{graphicx}    
+\usepackage[fleqn]{amsmath} 
+
+\sloppy
+
+\begin{document}
+
+\title{Practicum 1 Opzet DAR}
+\author{Gerben Aalvanger\\ 
+         3987051 \\
+        Universiteit Utrecht
+		\and
+		Sam van der Wal\\ 
+         3962652 \\
+        Universiteit Utrecht
+        }
+\date{Docent: \\ 
+Hans Phillipi \\
+\today}
+\maketitle
+
+\section{Metadatabase configuratie}
+\subsection{IDF$_k$}
+Bereken voor elk attribuut(A$_k$ berekenen we de IDF$_k$ voor elke value $v$ in A$_k$, h is de bandbreedte parameter en n is het totaal aantal attributen. 
+Voor numerieke attributen berekenen we dit met de formule: \eqref{IDFk}
+\begin{equation}
+IDF_k (v) = log(\frac{n}{\sum_{i}^{n}e^{-\frac{1}{2}(\frac{v_ i -v}{h})^2}})
+\label{IDFk}
+\end{equation}
+
+Voor gewone attributen berekenen we de IDF met de formule: \eqref{IDFstandard} waarbij F$_k$(v) het aantal tuples in R is, met A$_k$ = v
+\begin{equation}
+IDF_k (v) = log(\frac{n}{F_k(v)})
+\label{IDFstandard}
+\end{equation}
+Voor elke tupel voegen we voor elke attribuut A$_k$ een nieuw attribuut IDF$_k$ aan de metadatabase toe met de waarde van de IDF van het attribuut.
+\subsection{QF}
+QF kunnen we bereken met behulp van\eqref{eq}
+\begin{equation}
+\frac{RQF(v)}{RQFMax}
+\label{eq}
+\end{equation}
+Hierin is RQF(v) de frequentie van waarde v in alle queries en RQFMAX de frequentie van de meest genoemde waarde in de queries.
+De QF slaan we net als de IDF op door een attribuut toe te voegen in de metadatabase. Dit attribuut bevat de waarde van de QF van de value van het oorspronkelijke attribuut.
+Deze QF wordt berekent aan de hand van een tabel die we aan de hand van de metadata aanmaken. Deze tabel kan later ook gebruikt worden voor de Jaccard coefficient. In de tabel zijn n kolommen van de oorspronkelijke attributen. Er zijn Q rijen die elk een querie representeren van de workload. Er wordt een extra attribuut toegevoegd die aangeeft hoevaak een querie is uitgevoerd.  \\
+Voor de numerieke waarden moeten we iets bedenken.
+\subsection{Jaccard}
+De tabel die opgebouwd is kunnen wij ook gebruiken om de jaccardcoefficient te berekenen, er hoeft niet verdere preprocessing plaats te vinden.
+
+\section{Query verwerken}
+\subsection{IDF}
+Voor een query ranken wij door allereerst voor elk gegeven attribuut de similaritycoefficient te berekenen op basis van de IDF.
+Voor nummerieke attributen gebruiken wij de formule: \eqref{numattr}
+\begin{equation}
+S_{num}(v,q) = e^{-\frac{1}{2}(\frac{v-q}{h})^2} IDF(q)
+\label{numattr}
+\end{equation}
+
+Voor een enkel categorisch attribuut gebruiken wij de formule: \eqref{catattr}
+\begin{equation}
+S_{cat}(v,q) = \left\{ \begin{matrix}\mbox{Als q = v}  & IDF(v) \\ \mbox{Anders } & 0 \end{matrix}\right.
+\label{catattr}
+\end{equation}
+Voor een enkel categorisch attribuut met meerdere mogelijke attribuutwaarden gebruiken wij de formule: \eqref{mulcatattr}
+\begin{equation}
+% % S_{cat+}(v,q) = \underset{q\in Q}{max}\  S_{cat} (v, q)\\
+S_{cat+}(v,q) = \left\{ \begin{matrix}\mbox{Als q in v}  & IDF(v) \\ \mbox{Anders } & 0 \end{matrix}\right.
+\label{mulcatattr}
+\end{equation}
+
+Voor een volledige tupel is nu de similarity: \eqref{allattr}
+\begin{equation}
+\label{allattr}
+\end{equation}
+\subsection{QF}
+Voor de similaritycoefficient berekenen kunnen we met QF gebruik maken van de formule: \eqref{attrqf}
+\begin{equation}
+S(v,q) = \left\{ \begin{matrix}\mbox{Als q = v}  & QF(v) \\ \mbox{Anders } & 0 \end{matrix}\right.
+\label{attrqf}
+\end{equation}
+\subsection{JACCARD}
+Jaccard is te gebruiken in combinatie met IDF of/en QF, we veranderen de similaritycoefficient naar: 
+\begin{equation}
+S(v,q) = J(W(t), W(q)) QF(q)
+\label{catattr}
+\end{equation}
+\subsection{combinaties}
+De combinatie van QF, IDF en JACCARD levert de volgende formule op:
+\begin{equation}
+S(v,q) = J(W(t), W(q)) QF(q) IDF(q)
+\label{catattr}
+\end{equation}
+hiervoor geld dat de 
+\end{document}
+
+%SIM(V,Q) = \sum_{k=1}^{m}S_k(v_k,q_k)%
+
+
+
+
+
+
+
