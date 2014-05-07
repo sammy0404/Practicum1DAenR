@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SQLite;
-using System.IO;
 using System.Data;
+using System.IO;
 
 namespace Practicum1_DAenR
 {
@@ -14,8 +14,14 @@ namespace Practicum1_DAenR
         static SQLiteConnection dbObject;
         static void Main(string[] args)
         {
+            string tableName = "autompg"; 
             readDB();
-            writeDB();
+            //writeDB();
+            List<KeyValuePair<string, string>> tableLayout = getTable(tableName, dbObject);
+            WorkloadParser p = new WorkloadParser(tableName, tableLayout, dbObject);
+            p.parseWorkload();
+            IDF builder = new IDF(tableName, tableLayout, dbObject);
+            builder.IDFBuilder();
         }
 
         static void readDB()
@@ -40,16 +46,29 @@ namespace Practicum1_DAenR
             while (reader.Read())
                 Console.WriteLine("modeljaar: " + reader["model_year"] + "\tModel: " + reader["model"]);
             Console.ReadLine();
-            IDF builder = new IDF();
-            builder.IDFBuilder(dbObject);
-            
         }
 
-   //     static void parseWorkload(SQLiteConnection con)
-   //     {
-   //         StreamReader read = new StreamReader();
+        private static List<KeyValuePair<string, string>> getTable(string tabelnaam, SQLiteConnection con)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand("PRAGMA table_info(" + tabelnaam + ");"))
+            {
+                DataTable table = new DataTable();
+                cmd.Connection = con;
 
-     //   }
+                SQLiteDataAdapter adp = null;
+                try
+                {
+                    adp = new SQLiteDataAdapter(cmd);
+                    adp.Fill(table);
+                    return table.AsEnumerable().Select(r => new KeyValuePair<string, string>(r["name"].ToString(), r["type"].ToString())).ToList();
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }
+        }    
     }
+
 
 }

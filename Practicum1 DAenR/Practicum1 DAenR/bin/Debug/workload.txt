@@ -133,4 +133,3 @@
 1 times: SELECT displacement FROM autompg WHERE mpg = '8' AND cylinders = '7' AND horsepower = '250'
 1 times: SELECT * FROM autompg WHERE displacement = '385'
 1 times: SELECT horsepower, acceleration FROM autompg WHERE brand = 'mercury'
-

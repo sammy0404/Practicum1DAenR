@@ -14,3 +14,10 @@ C:\Users\Gerben\Documents\GitHub\Practicum1DAenR\Practicum1 DAenR\Practicum1 DAe
 C:\Users\Gerben\Documents\GitHub\Practicum1DAenR\Practicum1 DAenR\Practicum1 DAenR\bin\Debug\System.Data.SQLite.dll
 C:\Users\Gerben\Documents\GitHub\Practicum1DAenR\Practicum1 DAenR\Practicum1 DAenR\bin\Debug\System.Data.SQLite.xml
 C:\Users\Gerben\Documents\GitHub\Practicum1DAenR\Practicum1 DAenR\Practicum1 DAenR\obj\Debug\Practicum1 DAenR.csprojResolveAssemblyReference.cache
+C:\Users\Gerben\Desktop\Practicum1 DAenR\Practicum1 DAenR\bin\Debug\Practicum1 DAenR.exe.config
+C:\Users\Gerben\Desktop\Practicum1 DAenR\Practicum1 DAenR\obj\Debug\Practicum1 DAenR.exe
+C:\Users\Gerben\Desktop\Practicum1 DAenR\Practicum1 DAenR\obj\Debug\Practicum1 DAenR.pdb
+C:\Users\Gerben\Desktop\Practicum1 DAenR\Practicum1 DAenR\obj\Debug\Practicum1 DAenR.csprojResolveAssemblyReference.cache
+C:\Users\Gerben\Desktop\Practicum1 DAenR\Practicum1 DAenR\bin\Debug\Practicum1 DAenR.exe
+C:\Users\Gerben\Desktop\Practicum1 DAenR\Practicum1 DAenR\bin\Debug\Practicum1 DAenR.pdb
+C:\Users\Gerben\Desktop\Practicum1 DAenR\Practicum1 DAenR\bin\Debug\System.Data.SQLite.xml

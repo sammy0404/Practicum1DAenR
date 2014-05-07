@@ -11,68 +11,67 @@ namespace Practicum1_DAenR
 {
     class IDF
     {
-
-        public void IDFBuilder(SQLiteConnection dbObject)
+        private SQLiteConnection dbObject;
+        private List<KeyValuePair<string, string>> tableLayout;
+        private string tableName;
+        public IDF(string tblName, List<KeyValuePair<string, string>> table, SQLiteConnection dbCon)
         {
-            Dictionary<string, int> HashTabel = new Dictionary<string, int>();
-            string query;
-            List<KeyValuePair<string, string>> KVP = getTable("autompg", dbObject);
-            foreach (KeyValuePair<string, string> s in KVP)
+            tableName = tblName;
+            dbObject = dbCon;
+            tableLayout = table;
+        }
+        public void IDFBuilder()
+        {            
+            foreach (KeyValuePair<string, string> s in tableLayout)
             {
                 if (s.Key != "id")
                 {
-                    SQLiteCommand c = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s.Key + "IDF REAL", dbObject);
-                    c.ExecuteNonQuery();
-                    HashTabel.Clear();
-                    query = "select " + s.Key + " from autompg";
-                    SQLiteCommand commando = new SQLiteCommand(query, dbObject);
-                    SQLiteDataReader reader = commando.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        string a = reader[s.Key].ToString();
-                        if (HashTabel.ContainsKey(a))
-                        {
-                            HashTabel[a]++;
-                        }
-                        else
-                        {
-                            HashTabel.Add(a, 1);
-                        }
-                    }
-                    foreach (KeyValuePair<string, int> a in HashTabel)
-                    {
-                        SQLiteCommand d = new SQLiteCommand("UPDATE autompg set "+ s.Key+"IDF = " + a.Value + " WHERE " + s.Key + " = " + a.Key, dbObject);
-                        d.ExecuteNonQuery();
-                    }
-                    Console.WriteLine("sam is lelijk");
-                    Console.ReadLine();
+                    makeIDFColumn(s);
+                    calculateIDF(s);
                 }
-
             }
-            Console.WriteLine("KLAAR");
-            Console.ReadLine();
-
         }
 
-
-        public static List<KeyValuePair<string, string>> getTable(string tabelnaam, SQLiteConnection con)
+        private void makeIDFColumn(KeyValuePair<string, string> s)
         {
-            using (SQLiteCommand cmd = new SQLiteCommand("PRAGMA table_info(" + tabelnaam + ");"))
-            {
-                DataTable table = new DataTable();
-                cmd.Connection = con;
+            SQLiteCommand c = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s.Key + "IDF REAL", dbObject);
+            c.ExecuteNonQuery();
+        }
 
-                SQLiteDataAdapter adp = null;
-                try
+        private void calculateIDF (KeyValuePair<string, string> s )
+        {
+            int max = 0;
+            string maxString = "";
+            Dictionary<string, int> HashTabel = new Dictionary<string, int>();
+            string query = "select " + s.Key + " from autompg";
+            SQLiteCommand commando = new SQLiteCommand(query, dbObject);
+            SQLiteDataReader reader = commando.ExecuteReader();
+            while (reader.Read())
+            {
+                string a = reader[s.Key].ToString();
+                if (HashTabel.ContainsKey(a))
                 {
-                    adp = new SQLiteDataAdapter(cmd);
-                    adp.Fill(table);
-                    return table.AsEnumerable().Select(r => new KeyValuePair<string, string>(r["name"].ToString(), r["type"].ToString())).ToList();
+                    HashTabel[a]++;
+                    if (HashTabel[a] > max)
+                    {
+                        max = HashTabel[a];
+                        maxString = a;
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    return null;
+                    HashTabel.Add(a, 1);
+                    if (HashTabel[a] > max)
+                    {
+                        max = HashTabel[a];
+                        maxString = a;
+                    }
                 }
+            }
+            foreach (KeyValuePair<string, int> a in HashTabel)
+            {
+                SQLiteCommand d = new SQLiteCommand("UPDATE autompg set " + s.Key + "IDF = '" + a.Value + "' WHERE " + s.Key + " = '" + a.Key + "'", dbObject);
+                d.ExecuteNonQuery();
             }
         }
     }
