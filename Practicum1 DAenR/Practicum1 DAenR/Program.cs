@@ -41,5 +41,11 @@ namespace Practicum1_DAenR
             dbObject.Close();
             Console.ReadLine();
         }
+
+        static void parseWorkload(SQLiteConnection con){
+            StreamReader read = new StreamReader();
+
+        }
     }
+
 }
