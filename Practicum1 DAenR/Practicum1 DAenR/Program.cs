@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.IO;
+using System.Data;
 
 namespace Practicum1_DAenR
 {
@@ -38,14 +39,17 @@ namespace Practicum1_DAenR
             SQLiteDataReader reader = commando.ExecuteReader();
             while (reader.Read())
                 Console.WriteLine("modeljaar: " + reader["model_year"] + "\tModel: " + reader["model"]);
-            dbObject.Close();
             Console.ReadLine();
+            IDF builder = new IDF();
+            builder.IDFBuilder(dbObject);
+            
         }
 
-        static void parseWorkload(SQLiteConnection con){
-            StreamReader read = new StreamReader();
+   //     static void parseWorkload(SQLiteConnection con)
+   //     {
+   //         StreamReader read = new StreamReader();
 
-        }
+     //   }
     }
 
 }
