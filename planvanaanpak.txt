@@ -1,0 +1,30 @@
+De QF berekenen we alleen voor categorische attributen.
+De formule hiervoor is: QF(q) = (RQF(q)+1)/ (RQFMax+1) (nu hebben waarden die niet genoemd zijn ook een niet-nul waarde, hoewel een kleine waarde)
+De QF wordt in een attribuut opgeslagen in de tabel met de gewone waarden, net als IDF
+
+De Jaccard coefficient berekenenen we ook op categorische attributen.
+Voor elk categorische attribuut maken we een nieuwe tabel, met de attributen (jaccard, value1, value2)
+In deze tabel staan 2 mogelijke categorische attribuutwaarden met hun jaccard-coefficient
+
+
+
+
+
+Query berekening
+Voor een numeriek attribuut wordt altijd de waarde van de IDF in de ranking als norm gebruikt
+
+Voor een categorisch attribuut gebruiken wij de combinatie van QF, IDF en Jaccard
+S(v, q) = J (W (v),W (q)) * QF(q) * IDF(q)
+
+Voor een value die niet in de jaccard-tabel zit gebruiken wij als waarde:0, tenzij v=q, dan is de waarde 1.
+
+
+
+SLIMME top-k berekening
+
+Als we zoeken naar value V doen wij het volgende bij categorische waarden:
+We selecteren de bovenste (ordening v.a. grootste) coefficienten van de QF, IDF en de JACCARD (waar value1 == in V), dit gaat handig met een index.
+
+Met behulp van de in college uitgelegde top-k calculations berekenen we de top-K
+
+Voor numerieke attributen weten wij het nog niet.
