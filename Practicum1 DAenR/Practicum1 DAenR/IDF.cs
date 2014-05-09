@@ -12,9 +12,9 @@ namespace Practicum1_DAenR
     class IDF
     {
         private SQLiteConnection dbObject;
-        private List<KeyValuePair<string, string>> tableLayout;
+        private List<KeyValuePair<string, bool>> tableLayout;
         private string tableName;
-        public IDF(string tblName, List<KeyValuePair<string, string>> table, SQLiteConnection dbCon)
+        public IDF(string tblName, List<KeyValuePair<string, bool>> table, SQLiteConnection dbCon)
         {
             tableName = tblName;
             dbObject = dbCon;
@@ -22,7 +22,7 @@ namespace Practicum1_DAenR
         }
         public void IDFBuilder()
         {            
-            foreach (KeyValuePair<string, string> s in tableLayout)
+            foreach (KeyValuePair<string, bool> s in tableLayout)
             {
                 if (s.Key != "id")
                 {
@@ -32,13 +32,13 @@ namespace Practicum1_DAenR
             }
         }
 
-        private void makeIDFColumn(KeyValuePair<string, string> s)
+        private void makeIDFColumn(KeyValuePair<string, bool> s)
         {
             SQLiteCommand c = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s.Key + "IDF REAL", dbObject);
             c.ExecuteNonQuery();
         }
 
-        private void calculateIDF (KeyValuePair<string, string> s )
+        private void calculateIDF (KeyValuePair<string, bool> s )
         {
             int max = 0;
             string maxString = "";

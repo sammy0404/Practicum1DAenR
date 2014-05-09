@@ -17,10 +17,22 @@ namespace Practicum1_DAenR
             string tableName = "autompg"; 
             readDB();
             //writeDB();
-            List<KeyValuePair<string, string>> tableLayout = getTable(tableName, dbObject);
-            WorkloadParser p = new WorkloadParser(tableName, tableLayout, dbObject);
+            List<string> tableLayout = getTable(tableName, dbObject);
+            List<KeyValuePair<string,bool>> extendedTableLayout = new List<KeyValuePair<string,bool>>();
+            foreach (string column in tableLayout)
+            {
+                Console.WriteLine("Is '" + column +  "' a categorical value? ");
+                Console.WriteLine("Please type y//n");
+                ConsoleKeyInfo c = Console.ReadKey();
+                Console.WriteLine();
+                if( c.KeyChar == 'y') 
+                    extendedTableLayout.Add(new KeyValuePair<string,bool>(column, true));
+                else
+                    extendedTableLayout.Add(new KeyValuePair<string,bool>(column, false));
+            }
+            WorkloadParser p = new WorkloadParser(tableName, extendedTableLayout, dbObject);
             p.parseWorkload();
-            IDF builder = new IDF(tableName, tableLayout, dbObject);
+            IDF builder = new IDF(tableName, extendedTableLayout, dbObject);
             builder.IDFBuilder();
         }
 
@@ -48,7 +60,7 @@ namespace Practicum1_DAenR
             Console.ReadLine();
         }
 
-        private static List<KeyValuePair<string, string>> getTable(string tabelnaam, SQLiteConnection con)
+        private static List<string> getTable(string tabelnaam, SQLiteConnection con)
         {
             using (SQLiteCommand cmd = new SQLiteCommand("PRAGMA table_info(" + tabelnaam + ");"))
             {
@@ -60,7 +72,7 @@ namespace Practicum1_DAenR
                 {
                     adp = new SQLiteDataAdapter(cmd);
                     adp.Fill(table);
-                    return table.AsEnumerable().Select(r => new KeyValuePair<string, string>(r["name"].ToString(), r["type"].ToString())).ToList();
+                    return table.AsEnumerable().Select(r => r["name"].ToString()).ToList();
                 }
                 catch (Exception ex)
                 {
