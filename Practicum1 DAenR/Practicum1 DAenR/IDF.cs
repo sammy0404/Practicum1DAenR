@@ -21,7 +21,7 @@ namespace Practicum1_DAenR
             tableLayout = table;
         }
         public void IDFBuilder()
-        {            
+        {
             foreach (KeyValuePair<string, bool> s in tableLayout)
             {
                 if (s.Key != "id")
@@ -31,47 +31,87 @@ namespace Practicum1_DAenR
                 }
             }
         }
+        private double calcIDFNum(double v, Dictionary<string, int> values, double sigma)
+        {
+            double n = values.Sum(x => x.Value);
+            double h = 1.06 * sigma * Math.Pow(n, 1.0 / 5.0);
 
+            double sum = 0;
+            foreach (KeyValuePair<string, int> kvp in values)
+            {
+                double vi = double.Parse(kvp.Key);
+                sum += Math.Exp(-0.5 * Math.Pow((vi - v) / h, 2)) * (double)kvp.Value;
+            }
+            return Math.Log10(n / sum);
+        }
+        private double calcIDFCat(double n, double freq)
+        {
+            return Math.Log10(n / freq);
+        }
         private void makeIDFColumn(KeyValuePair<string, bool> s)
         {
             SQLiteCommand c = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s.Key + "IDF REAL", dbObject);
             c.ExecuteNonQuery();
         }
 
-        private void calculateIDF (KeyValuePair<string, bool> s )
+        private double getStandardDeviation(Dictionary<string, int> doubleList, int n)
         {
-            int max = 0;
-            string maxString = "";
-            Dictionary<string, int> HashTabel = new Dictionary<string, int>();
+            double sum = 0;
+            foreach (KeyValuePair<string, int> kvp in doubleList)
+            {
+                sum += (double)kvp.Value * double.Parse(kvp.Key);
+            }
+            double average = sum / (double)n;
+            double sumOfDerivation = 0;
+            foreach (KeyValuePair<string, int> value in doubleList)
+            {
+                sumOfDerivation += (double.Parse(value.Key)) * (double.Parse(value.Key)) * (double)value.Value;
+            }
+            double sumOfDerivationAverage = sumOfDerivation / (n - 1);
+            return Math.Sqrt(sumOfDerivationAverage - (average * average));
+        } 
+
+        private void calculateIDF(KeyValuePair<string, bool> s)
+        {
             string query = "select " + s.Key + " from autompg";
             SQLiteCommand commando = new SQLiteCommand(query, dbObject);
             SQLiteDataReader reader = commando.ExecuteReader();
+            int sum = 0;
+            Dictionary<string, int> HashTabel = new Dictionary<string, int>();
             while (reader.Read())
             {
+                sum++;
                 string a = reader[s.Key].ToString();
                 if (HashTabel.ContainsKey(a))
                 {
                     HashTabel[a]++;
-                    if (HashTabel[a] > max)
-                    {
-                        max = HashTabel[a];
-                        maxString = a;
-                    }
                 }
                 else
                 {
                     HashTabel.Add(a, 1);
-                    if (HashTabel[a] > max)
-                    {
-                        max = HashTabel[a];
-                        maxString = a;
-                    }
                 }
             }
-            foreach (KeyValuePair<string, int> a in HashTabel)
+
+            if (s.Value == true)
             {
-                SQLiteCommand d = new SQLiteCommand("UPDATE autompg set " + s.Key + "IDF = '" + a.Value + "' WHERE " + s.Key + " = '" + a.Key + "'", dbObject);
-                d.ExecuteNonQuery();
+                //categorisch
+                foreach (KeyValuePair<string, int> kvp in HashTabel)
+                {
+                    double d = calcIDFCat(sum, kvp.Value);
+                    SQLiteCommand command = new SQLiteCommand("UPDATE autompg set " + s.Key + "IDF = '" + d + "' WHERE " + s.Key + " = '" + kvp.Key + "'", dbObject);
+                    command.ExecuteNonQuery();
+                }
+            }
+            else
+            {
+                // numeriek
+                double sigma = getStandardDeviation(HashTabel, sum);
+                foreach (KeyValuePair<string, int> kvp in HashTabel)
+                {
+                    double d = calcIDFNum(double.Parse(kvp.Key), HashTabel, sigma);
+                    SQLiteCommand command = new SQLiteCommand("UPDATE autompg set " + s.Key + "IDF = '" + d + "' WHERE " + s.Key + " = '" + kvp.Key + "'", dbObject);
+                    command.ExecuteNonQuery();
+                }
             }
         }
     }
