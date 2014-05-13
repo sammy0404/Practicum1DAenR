@@ -26,6 +26,10 @@ namespace Practicum1_DAenR
         public void parseWorkload()
         {
             createWorkloadTables();
+            foreach (string colmn in tableLayout)
+            {
+                makeQFColumn(colmn);
+            }
             StreamReader read = new StreamReader("workload.txt");
             read.ReadLine(); read.ReadLine();
             string s = "";
@@ -39,6 +43,45 @@ namespace Practicum1_DAenR
                 }
             }
 
+            Dictionary<string , int> RQFMax = new Dictionary<string, int>();
+
+            Dictionary<string, int> RQF = new Dictionary<string, int>();
+            foreach (KeyValuePair<string, int> kvp in dict)
+            {
+                string[] pairs = kvp.Key.Split(';');
+                if (pairs[0] == pairs[1])
+                {
+                    if (!RQFMax.ContainsKey(pairs[2])){
+                        RQFMax.Add(pairs[2], kvp.Value);
+                    }                   
+                    else if(kvp.Value > RQFMax[pairs[2]])
+                        RQFMax[pairs[2]] = kvp.Value;
+
+                    RQF.Add(pairs[0] + ";" + pairs[2] , kvp.Value);
+                }
+            }
+
+            foreach (KeyValuePair<string, int> kvp in RQF)
+            {                
+                string[] split = kvp.Key.Split(';');
+                string value = split[0];
+                string attr = split[1];
+                int RQFval = kvp.Value + 1;
+                double QF = (double)RQFval / ((double)RQFMax[attr]+1);
+                string query = "UPDATE autompg SET " + attr + "QF = " + QF + " WHERE " + attr + " = '" + value + "'";
+                SQLiteCommand cmd = new SQLiteCommand(query, con);
+                cmd.ExecuteNonQuery();
+            }
+            foreach(string column in tableLayout){
+                int RQFMx = 0;
+                if(!RQFMax.ContainsKey(column))
+                    RQFMx = 1;
+                else
+                    RQFMx = RQFMax[column]+1;
+                string query = "UPDATE autompg SET " + column + "QF = " + 1.0 / (double)RQFMx + " WHERE " + column + "QF ISNULL";
+                SQLiteCommand cmd = new SQLiteCommand(query, con);
+                cmd.ExecuteNonQuery();
+            }
             foreach(KeyValuePair<string, int> kvp in dict){
                 string[] pairs = kvp.Key.Split(';');
                 string value1 = pairs[0];
@@ -55,6 +98,11 @@ namespace Practicum1_DAenR
                 // voeg hier aan de DB toe!
             }
 
+        }
+        private void makeQFColumn(string s)
+        {
+            SQLiteCommand c = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s + "QF REAL", con);
+            c.ExecuteNonQuery();
         }
         private void createWorkloadTables()
         {
@@ -169,120 +217,4 @@ namespace Practicum1_DAenR
     }
 }
 
-
-
-    //    public void parseWorkloads()
-    //    {
-    //        createWorkloadTables();
-    //        StreamReader read = new StreamReader("workload.txt");
-    //        read.ReadLine(); read.ReadLine();
-    //        Dictionary<string, Dictionary<string, Dictionary<string, int>>> dict = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>();
-    //        foreach (string column in tableLayout)
-    //        {
-    //            dict.Add(column, new Dictionary<string, Dictionary<string, int>>());
-    //        }
-    //        string s = "";
-    //        List<QueryParser> lijst = new List<QueryParser>();
-    //        while ((s = read.ReadLine()) != null)
-    //        {
-    //            lijst.Add(new QueryParser(s, tableLayout));
-    //        }
-    //        foreach (QueryParser querP in lijst)
-    //        {
-    //            foreach (AttributeParser attrP in querP)
-    //            {
-    //                Dictionary<string, Dictionary<string, int>> attrTabel = dict[attrP.attribute];
-    //                foreach (string value in attrP)
-    //                {
-    //                    if (!attrTabel.ContainsKey(value))
-    //                    {
-    //                        attrTabel.Add(value, new Dictionary<string, int>());
-    //                        SQLiteCommand columnQuery = new SQLiteCommand("ALTER TABLE workload" + attrP.attribute + " ADD COLUMN " + value + " REAL", con);
-    //                        columnQuery.ExecuteNonQuery();
-    //                    }
-    //                }
-    //            }
-
-    //            foreach (AttributeParser attrP in querP)
-    //            {
-    //                Dictionary<string, Dictionary<string, int>> attrTabel = dict[attrP.attribute];
-    //                foreach (string value in attrP)
-    //                {
-    //                    attrTabel[value][value] += querP.times;
-    //                    foreach (string value2 in attrP)
-    //                    {
-    //                        if (value != value2)
-    //                            attrTabel[value][value2] += querP.times;
-    //                    }
-    //                }
-    //            }
-
-    //        }
-    //        int i = 0;
-    //        i++;
-    //    }
-
-
-
-    //    private void createWorkloadTable()
-    //    {
-    //        string command = "CREATE TABLE " + tableName + "Workload (";
-    //        command += "value1 string, value2 string, aantal integer ";
-    //        int i = 1;
-    //        while (i < tableLayout.Count)
-    //        {
-    //            //command += ", " + tableLayout[i].Key + " text ";
-    //            i++;
-    //        }
-    //        command += ");";
-    //        SQLiteCommand cmd = new SQLiteCommand(command, con);
-    //        cmd.ExecuteNonQuery();
-    //    }
-    //    private static WorkloadEntry parseEntry(string query, string tabel)
-    //    {
-    //        string[] splitted = query.Split(new string[] { " times: " }, StringSplitOptions.None);
-    //        WorkloadEntry entry = new WorkloadEntry(int.Parse(splitted[0]), tabel);
-    //        query = splitted[1];
-    //        splitted = query.Split(new string[] { " WHERE " }, StringSplitOptions.None);
-    //        query = splitted[1];
-    //        splitted = query.Split(new string[] { " AND " }, StringSplitOptions.None);
-    //        foreach (string part in splitted)
-    //        {
-    //            string[] splittedpart = part.Split(new string[] { " IN ", " = " }, StringSplitOptions.None);
-    //            string kolom = splittedpart[0];
-    //            string info = splittedpart[1];
-    //            info = info.Substring(1, info.Length - 2);
-    //            info = info.Replace("'", string.Empty);
-    //            entry.columns.Add(new KeyValuePair<string, string>(kolom, info));
-    //        }
-    //        return entry;
-    //    }
-
-    //}
-    //class WorkloadEntry
-    //{
-    //    int times;
-    //    string tabel;
-    //    public List<KeyValuePair<string, string>> columns = new List<KeyValuePair<string, string>>();
-    //    public WorkloadEntry(int malen, string tbl)
-    //    {
-    //        tabel = tbl;
-    //        times = malen;
-    //    }
-    //    public string getInsertQuery()
-    //    {
-    //        string query = "INSERT INTO " + tabel + "Workload (aantal";
-    //        foreach (KeyValuePair<string, string> kvp in columns)
-    //        {
-    //            query += ", " + kvp.Key;
-    //        }
-    //        query += ") VALUES (" + times;
-    //        foreach (KeyValuePair<string, string> kvp in columns)
-    //        {
-    //            query += ", '" + kvp.Value + "'";
-    //        }
-    //        query += ")";
-    //        return query;
-    //    }
-    //}
 
