@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2014.2.3)  6 MAY 2014 12:21
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9) (preloaded format=pdflatex 2014.2.3)  12 MAY 2014 15:37
 entering extended mode
-**D:/UU/Data-Analyze*en*Retrieval/Pract1*DAR.tex
-("D:/UU/Data-Analyze en Retrieval/Pract1 DAR.tex"
+**C:/Users/Gebruiker/Documents/GitHub/Practicum1DAenR/Verslag/Pract1*DAR.tex
+("C:/Users/Gebruiker/Documents/GitHub/Practicum1DAenR/Verslag/Pract1 DAR.tex"
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
@@ -139,7 +139,7 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
 LaTeX Info: Redefining \[ on input line 2665.
 LaTeX Info: Redefining \] on input line 2666.
 )
-("D:\UU\Data-Analyze en Retrieval\Pract1 DAR.aux"
+("C:\Users\Gebruiker\Documents\GitHub\Practicum1DAenR\Verslag\Pract1 DAR.aux"
 
 LaTeX Warning: Label `catattr' multiply defined.
 
@@ -174,20 +174,20 @@ LaTeX Font Info:    ... okay on input line 12.
 \everyMPtoPDFconversion=\toks21
 ) [1
 
-{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}] [2]
-("D:\UU\Data-Analyze en Retrieval\Pract1 DAR.aux")
+{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}] [2] [3]
+("C:\Users\Gebruiker\Documents\GitHub\Practicum1DAenR\Verslag\Pract1 DAR.aux")
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
  2077 strings out of 493921
- 26013 string characters out of 3144865
- 84747 words of memory out of 3000000
+ 26209 string characters out of 3144865
+ 86747 words of memory out of 3000000
  5384 multiletter control sequences out of 15000+200000
  8715 words of font info for 32 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 27i,9n,24p,433b,201s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,9n,24p,564b,201s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 <C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C
 :/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/
@@ -199,11 +199,12 @@ s (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files (
 x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files (x86
 )/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Program Files (x86)/Mi
 KTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Program Files (x86)/MiKTeX
- 2.9/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Program Files (x86)/MiKTeX 2.
-9/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on "Pract1 DAR.pdf" (2 pages, 142882 bytes).
+ 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x86)/MiKTeX 2
+.9/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Program Files (x86)/MiKTeX 2.9/
+fonts/type1/public/amsfonts/cm/cmsy7.pfb>
+Output written on "Pract1 DAR.pdf" (3 pages, 154742 bytes).
 PDF statistics:
- 61 PDF objects out of 1000 (max. 8388607)
+ 68 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

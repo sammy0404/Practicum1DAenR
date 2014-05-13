@@ -33,26 +33,29 @@ Voor numerieke attributen berekenen we dit met de formule: \eqref{IDFk}
 IDF_k (v) = log(\frac{n}{\sum_{i}^{n}e^{-\frac{1}{2}(\frac{v_ i -v}{h})^2}})
 \label{IDFk}
 \end{equation}
-
 Voor gewone attributen berekenen we de IDF met de formule: \eqref{IDFstandard} waarbij F$_k$(v) het aantal tuples in R is, met A$_k$ = v
 \begin{equation}
 IDF_k (v) = log(\frac{n}{F_k(v)})
 \label{IDFstandard}
 \end{equation}
 Voor elke tupel voegen we voor elke attribuut A$_k$ een nieuw attribuut IDF$_k$ aan de metadatabase toe met de waarde van de IDF van het attribuut.
+\subsection{Jaccard}
+De Jaccard coefficient berekenenen we alleen op categorische attributen.\eqref{Jaccard}
+Voor elk categorische attribuut maken we een nieuwe tabel, met de attributen (jaccard, value1, value2)
+In deze tabel staan 2 mogelijke categorische attribuutwaarden met hun jaccard-coefficient
+\begin{equation}
+J(W(v), W(q)) = \frac{\mid W(v)\cap W(q)\mid}{\mid W(v)\cup W(q)\mid}
+\label{Jaccard}
+\end{equation}
 \subsection{QF}
 QF kunnen we bereken met behulp van\eqref{eq}
 \begin{equation}
-\frac{RQF(v)}{RQFMax}
+\frac{RQF(v)+1}{RQFMax+1}
 \label{eq}
 \end{equation}
 Hierin is RQF(v) de frequentie van waarde v in alle queries en RQFMAX de frequentie van de meest genoemde waarde in de queries.
-De QF slaan we net als de IDF op door een attribuut toe te voegen in de metadatabase. Dit attribuut bevat de waarde van de QF van de value van het oorspronkelijke attribuut.
-Deze QF wordt berekent aan de hand van een tabel die we aan de hand van de metadata aanmaken. Deze tabel kan later ook gebruikt worden voor de Jaccard coefficient. In de tabel zijn n kolommen van de oorspronkelijke attributen. Er zijn Q rijen die elk een querie representeren van de workload. Er wordt een extra attribuut toegevoegd die aangeeft hoevaak een querie is uitgevoerd.  \\
-Voor de numerieke waarden moeten we iets bedenken.
-\subsection{Jaccard}
-De tabel die opgebouwd is kunnen wij ook gebruiken om de jaccardcoefficient te berekenen, er hoeft niet verdere preprocessing plaats te vinden.
-
+De QF slaan we net als de IDF op door een attribuut toe te voegen in de metadatabase. Dit attribuut bevat de waarde van de QF van de value van het oorspronkelijke attribuut. De QF wordt tegelijk met Jaccard berekend op het moment dat wij de jaccard van een value v met zichzelf berekenen. Op dit moment hogen wij de RQF(v) op.
+Als alle RQF(v) bekend zijn dan berekenen we met de RQFMAX de QF voor alle attribuutwaarden.
 \section{Query verwerken}
 \subsection{IDF}
 Voor een query ranken wij door allereerst voor elk gegeven attribuut de similaritycoefficient te berekenen op basis van de IDF.
@@ -69,15 +72,10 @@ S_{cat}(v,q) = \left\{ \begin{matrix}\mbox{Als q = v}  & IDF(v) \\ \mbox{Anders 
 \end{equation}
 Voor een enkel categorisch attribuut met meerdere mogelijke attribuutwaarden gebruiken wij de formule: \eqref{mulcatattr}
 \begin{equation}
-% % S_{cat+}(v,q) = \underset{q\in Q}{max}\  S_{cat} (v, q)\\
 S_{cat+}(v,q) = \left\{ \begin{matrix}\mbox{Als q in v}  & IDF(v) \\ \mbox{Anders } & 0 \end{matrix}\right.
 \label{mulcatattr}
 \end{equation}
 
-Voor een volledige tupel is nu de similarity: \eqref{allattr}
-\begin{equation}
-\label{allattr}
-\end{equation}
 \subsection{QF}
 Voor de similaritycoefficient berekenen kunnen we met QF gebruik maken van de formule: \eqref{attrqf}
 \begin{equation}
@@ -90,16 +88,24 @@ Jaccard is te gebruiken in combinatie met IDF of/en QF, we veranderen de similar
 S(v,q) = J(W(t), W(q)) QF(q)
 \label{catattr}
 \end{equation}
+Als de Jaccard-coefficient niet in de tabel aanwezig is, is deze 0, tenzij q = v, dan is de coefficient 1.
 \subsection{combinaties}
 De combinatie van QF, IDF en JACCARD levert de volgende formule op:
 \begin{equation}
-S(v,q) = J(W(t), W(q)) QF(q) IDF(q)
+S(v,q) = J(W(v), W(q)) QF(q) IDF(q)
 \label{catattr}
 \end{equation}
-hiervoor geld dat de 
+Dit geld enkel voor categorische waarden. Voor numerieke waarden gebruiken wij enkel de IDF uit formule \eqref{numattr}
+\section{Top-k}
+In onze metadata gebruiken wij voor alle attributen een aparte index. Dit betekent wel dat we lang aan het preprocessen zijn om de metadata te krijgen. Maar hierna kunnen we het treshold algoritme sneller resultaten laten opleveren. Door deze manier kunnen we dus met indexes snel de queries laten verlopen. Buiten de query om zullen we dan de top-k selectie maken. De query levert dan wel een gesorteerde lijst op, maar het algortime hoeft niet langs alle n elementen van de database. 
+Als we zoeken naar value V doen wij het volgende bij categorische waarden:
+We selecteren de bovenste (ordening v.a. grootste) coefficienten van de QF, IDF en de JACCARD (waar value1 $\in V$), dit gaat handig met een index.
+
+Voor numerieke attributen hebben we twee ideeen om de dichtsbijzijnde waarden bij value v te selecteren. \\
+1: \indent Als de gezochte numerieke waarde v is, zoeken we in een range van 0.9 * v en 1.1 * v. Hierbij kennen we waardes die dichter bij x liggen een hogere score toe dan waardes die daar verder van af liggen. Daarna sorteren we op deze waarde. \\
+2:\indent We selecteren m waarden die dicht bij v liggen, dit doen hierbij kiezen wij de m/2 kleinste elementen $>$ v en de m/2 grootste elementen $<$ v.
 \end{document}
 
-%SIM(V,Q) = \sum_{k=1}^{m}S_k(v_k,q_k)%
 
 
 

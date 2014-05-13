@@ -60,7 +60,7 @@ namespace Practicum1_DAenR
         {
             foreach (string column in tableLayout)
             {
-                string query = "CREATE TABLE workload" + column + " (value1 real, value2, real, jaccard integer); ";
+                string query = "CREATE TABLE workload" + column + " (value1 real, value2, jaccard real); ";
                 SQLiteCommand cmd = new SQLiteCommand(query, con);
                 cmd.ExecuteNonQuery();
                 query = "CREATE INDEX " + column + "values ON workload" + column + " (value1 , value2)";
