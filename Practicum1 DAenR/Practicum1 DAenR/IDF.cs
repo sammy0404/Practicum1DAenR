@@ -74,6 +74,7 @@ namespace Practicum1_DAenR
         private void calculateIDF(KeyValuePair<string, bool> s)
         {
             string query = "select " + s.Key + " from autompg";
+            
             SQLiteCommand commando = new SQLiteCommand(query, dbObject);
             SQLiteDataReader reader = commando.ExecuteReader();
             int sum = 0;
@@ -105,7 +106,12 @@ namespace Practicum1_DAenR
             else
             {
                 // numeriek
-                double sigma = getStandardDeviation(HashTabel, sum);
+
+                string query2 = "SELECT AVG((autompg." + s.Key + " - sub.a) * (autompg." + s.Key + " - sub.a)) as var from autompg, (SELECT AVG(" + s.Key + ") AS a FROM autompg) AS sub;";
+
+                SQLiteCommand comnd = new SQLiteCommand(query2, dbObject);
+                var v = comnd.ExecuteScalar();
+                double sigma = Math.Sqrt(double.Parse(v.ToString()));
                 foreach (KeyValuePair<string, int> kvp in HashTabel)
                 {
                     double d = calcIDFNum(double.Parse(kvp.Key), HashTabel, sigma);
