@@ -68,7 +68,8 @@ namespace Practicum1_DAenR
                 string attr = split[1];
                 int RQFval = kvp.Value + 1;
                 double QF = (double)RQFval / ((double)RQFMax[attr]+1);
-                string query = "UPDATE autompg SET " + attr + "QF = " + QF + " WHERE " + attr + " = '" + value + "'";
+                string QFstring = QF.ToString(CultureInfo.CreateSpecificCulture("en-GB"));
+                string query = "UPDATE autompg SET " + attr + "QF = " + QFstring + " WHERE " + attr + " = '" + value + "'";
                 SQLiteCommand cmd = new SQLiteCommand(query, con);
                 cmd.ExecuteNonQuery();
             }
@@ -78,7 +79,7 @@ namespace Practicum1_DAenR
                     RQFMx = 1;
                 else
                     RQFMx = RQFMax[column]+1;
-                string query = "UPDATE autompg SET " + column + "QF = " + 1.0 / (double)RQFMx + " WHERE " + column + "QF ISNULL";
+                string query = "UPDATE autompg SET " + column + "QF = " + (1.0 / (double)RQFMx).ToString(CultureInfo.CreateSpecificCulture("en-GB")) + " WHERE " + column + "QF ISNULL";
                 SQLiteCommand cmd = new SQLiteCommand(query, con);
                 cmd.ExecuteNonQuery();
             }

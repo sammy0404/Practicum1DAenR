@@ -7,6 +7,8 @@ using System.Data.SQLite;
 using System.IO;
 using System.Data;
 
+using System.Globalization;
+
 namespace Practicum1_DAenR
 {
     class IDF
@@ -69,12 +71,12 @@ namespace Practicum1_DAenR
             }
             double sumOfDerivationAverage = sumOfDerivation / (n - 1);
             return Math.Sqrt(sumOfDerivationAverage - (average * average));
-        } 
+        }
 
         private void calculateIDF(KeyValuePair<string, bool> s)
         {
-            string query = "select " + s.Key + " from autompg";
-            
+            string query = "select " + s.Key + " AS key from autompg";
+
             SQLiteCommand commando = new SQLiteCommand(query, dbObject);
             SQLiteDataReader reader = commando.ExecuteReader();
             int sum = 0;
@@ -82,7 +84,16 @@ namespace Practicum1_DAenR
             while (reader.Read())
             {
                 sum++;
-                string a = reader[s.Key].ToString();
+                string a;
+                if (s.Value)
+                {
+                    a = reader["key"].ToString();
+                }
+                else
+                {
+                    double d = reader.GetDouble(0);
+                    a = d.ToString(CultureInfo.CreateSpecificCulture("en-GB"));
+                }
                 if (HashTabel.ContainsKey(a))
                 {
                     HashTabel[a]++;
@@ -99,7 +110,7 @@ namespace Practicum1_DAenR
                 foreach (KeyValuePair<string, int> kvp in HashTabel)
                 {
                     double d = calcIDFCat(sum, kvp.Value);
-                    SQLiteCommand command = new SQLiteCommand("UPDATE autompg set " + s.Key + "IDF = '" + d + "' WHERE " + s.Key + " = '" + kvp.Key + "'", dbObject);
+                    SQLiteCommand command = new SQLiteCommand("UPDATE autompg set " + s.Key + "IDF = " + d.ToString(CultureInfo.CreateSpecificCulture("en-GB")) + " WHERE " + s.Key + " = '" + kvp.Key + "'", dbObject);
                     command.ExecuteNonQuery();
                 }
             }
@@ -115,7 +126,8 @@ namespace Practicum1_DAenR
                 foreach (KeyValuePair<string, int> kvp in HashTabel)
                 {
                     double d = calcIDFNum(double.Parse(kvp.Key), HashTabel, sigma);
-                    SQLiteCommand command = new SQLiteCommand("UPDATE autompg set " + s.Key + "IDF = '" + d + "' WHERE " + s.Key + " = '" + kvp.Key + "'", dbObject);
+                    string query3 = "UPDATE autompg set " + s.Key + "IDF = " + d.ToString(CultureInfo.CreateSpecificCulture("en-GB")) + " WHERE " + s.Key + " = " + kvp.Key + "";
+                    SQLiteCommand command = new SQLiteCommand(query3, dbObject);
                     command.ExecuteNonQuery();
                 }
             }
