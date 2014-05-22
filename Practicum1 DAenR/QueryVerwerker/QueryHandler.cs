@@ -13,9 +13,7 @@ namespace QueryVerwerker
     {
         SQLiteConnection con;
         int k = 10;
-        //Dictionary<string, double> numeriek = new Dictionary<string,double>();
-        //Dictionary<string, string> categorisch = new Dictionary<string, string>();
-        Dictionary<string, Equality> equalities = new Dictionary<string, Equality>();
+        List<Equality> equalities = new List<Equality>();
         public Dictionary<string, bool> columns = new Dictionary<string, bool>();
         public QueryHandler(string s)
         {
@@ -73,17 +71,129 @@ namespace QueryVerwerker
             {
                 if(!columns[kvp.Key])
                 {
-                    this.equalities.Add(kvp.Key, new NumEquality(kvp.Key, kvp.Value, con));
+                    this.equalities.Add(new NumEquality(kvp.Key, kvp.Value, con));
                     //numeriek.Add(kvp.Key, double.Parse(kvp.Value));
                 }
 
                 else
                 {
-                    this.equalities.Add(kvp.Key, new CatEquality(kvp.Key, kvp.Value, con));
+                    this.equalities.Add(new CatEquality(kvp.Key, kvp.Value, con));
                     //categorisch.Add(kvp.Key, kvp.Value);
                 }
             }
         }
+        public List<int> getTopK()
+        {
+            double treshold = getGlobalTreshold();
+            SortedList<DoubleDing, int> lijst = new SortedList<DoubleDing, int>();
+            Dictionary<int, double> dict = new Dictionary<int, double>();
+            // duplicaten
+            while (lijst.Count <= k || lijst.ElementAt(lijst.Count-k).Key.d < treshold)
+            {
+                Dictionary<int, double> iterationDict = nextIteration();
+                foreach (KeyValuePair<int, double> kvp in iterationDict)
+                {
+                    if (!dict.ContainsKey(kvp.Key) && !lijst.ContainsKey(new DoubleDing(kvp.Value, kvp.Key)))
+                    {
+                        lijst.Add(new DoubleDing(kvp.Value, kvp.Key), kvp.Key);
+                        dict.Add(kvp.Key, kvp.Value);
+                    }
+                }
+
+                treshold = getGlobalTreshold();
+
+            }
+            List<int> ids = new List<int>();
+            for (int i = 0; i < k; i++)
+            {
+                ids.Add(lijst.ElementAt(lijst.Count - 1 - i).Value);
+            }
+            
+
+
+            return ids;
+        }
+        public void appender(StringBuilder b, List<int> ids)
+        {
+            List<string> columnsList = columns.Keys.ToList();
+            string selectpart = columnsList[0];
+            for (int j = 1; j < columns.Count; j++)
+            {
+                selectpart += ", " + columnsList[j];
+            }
+            foreach (int id in ids)
+            {
+                string idQuery = " SELECT " + selectpart + " FROM autompg WHERE id = " + id;
+                SQLiteCommand cmd = new SQLiteCommand(idQuery, con);
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                    object[] valuesresult = new object[columns.Count];
+                    reader.GetValues(valuesresult);
+                    int i = 0;
+                    foreach (object s in valuesresult)
+                    {
+                        b.Append(columnsList[i] + ": " + s.ToString() + ", ");
+                        i++;
+                    }
+                    b.AppendLine("");
+                }
+
+            }
+        }
+        private Dictionary<int, double> nextIteration()
+        {
+            Dictionary<int, double> dict = new Dictionary<int, double>();
+            foreach (Equality eq in equalities)
+            {
+                Dictionary<int, double> p = eq.getNextOptions();
+                foreach (KeyValuePair<int, double> value in p)
+                {
+                    if (!dict.ContainsKey(value.Key))
+                    {
+                        dict.Add(value.Key, getGlobalValue(value.Key));
+                    }
+                }
+            }
+            return dict;
+        }
+        private double getGlobalValue(int id){
+            double sum = 0.0;
+            foreach (Equality eq in equalities)
+            {
+                sum += eq.getValueOf(id);
+            }
+            return sum;
+        }
+        private double getGlobalTreshold()
+        {
+            double sum = 0.0;
+            foreach (Equality eq in equalities)
+            {
+                sum += eq.getLocalTreshold();
+            }
+            return sum;
+        }
     }
-    
+
+    public class DoubleDing : IComparable
+    {
+        public int id;
+        public double d;
+        public DoubleDing(double d, int i)
+        {
+            this.d = d;
+            id = i;
+        }
+        public int CompareTo(Object de)
+        {
+            DoubleDing dd = (DoubleDing)de;
+            if (dd.d == this.d)
+            {
+                return this.id.CompareTo(dd.id);
+            }
+            return this.d.CompareTo(dd.d);
+        }
+    }
 }

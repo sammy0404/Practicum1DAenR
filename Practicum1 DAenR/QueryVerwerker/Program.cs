@@ -101,8 +101,10 @@ namespace QueryVerwerker
                 string q = query[i];
                 b.AppendLine("Ingevoerde query: " + q);
                 b.AppendLine("Resultaat: ");
-                QueryHandler handler = new QueryHandler(q);
+                QueryHandler handler = new QueryHandler(q);              
+                List<int> ids = handler.getTopK();
 
+                handler.appender(b, ids);
                 b.AppendLine("-----------------------------------------------------------");
 
             }

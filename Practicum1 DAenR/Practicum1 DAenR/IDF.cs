@@ -52,8 +52,11 @@ namespace Practicum1_DAenR
         }
         private void makeIDFColumn(KeyValuePair<string, bool> s)
         {
-            SQLiteCommand c = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s.Key + "IDF REAL", dbObject);
-            c.ExecuteNonQuery();
+            SQLiteCommand cmd = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s.Key + "IDF REAL", dbObject);
+            cmd.ExecuteNonQuery();
+            string indexQuery = "CREATE INDEX " + s.Key + "IDFindex ON autompg (" + s.Key + "IDF)";
+            cmd = new SQLiteCommand(indexQuery, dbObject);
+            cmd.ExecuteNonQuery();
         }
 
         private double getStandardDeviation(Dictionary<string, int> doubleList, int n)

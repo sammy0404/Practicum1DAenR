@@ -29,13 +29,19 @@ namespace Practicum1_DAenR
                     extendedTableLayout.Add(new KeyValuePair<string,bool>(column, true));
                 else
                     extendedTableLayout.Add(new KeyValuePair<string,bool>(column, false));
+                makeIndexOn(column);
             }
             WorkloadParser p = new WorkloadParser(tableName, extendedTableLayout, dbObject);
             p.parseWorkload();
             IDF builder = new IDF(tableName, extendedTableLayout, dbObject);
             builder.IDFBuilder();
         }
-
+        static void makeIndexOn(string s)
+        {
+            string indexQuery = "CREATE INDEX " + s + "index ON autompg (" + s + ")";
+            SQLiteCommand cmd = new SQLiteCommand(indexQuery, dbObject);
+            cmd.ExecuteNonQuery();
+        }
         static void readDB()
         {
             SQLiteConnection.CreateFile("cars.sqlite");

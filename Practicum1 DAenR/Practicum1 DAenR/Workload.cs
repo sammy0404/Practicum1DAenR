@@ -83,6 +83,24 @@ namespace Practicum1_DAenR
                 SQLiteCommand cmd = new SQLiteCommand(query, con);
                 cmd.ExecuteNonQuery();
             }
+            foreach (string col in tableLayout)
+            {
+                string myquery = "SELECT "+ col + " FROM autompg GROUP by " + col;
+                SQLiteCommand kolom = new SQLiteCommand(myquery, con);
+                SQLiteDataReader kolomreader = kolom.ExecuteReader();
+                List<string> waardenlijst = new List<string>();
+                while (kolomreader.Read())
+                {
+                    waardenlijst.Add(kolomreader.GetString(0));
+                }
+                foreach (string waarde in waardenlijst)
+                {
+                    if (!dict.ContainsKey(waarde + ";" + waarde + ";" + col))
+                    {
+                        dict.Add(waarde + ";" + waarde + ";" + col, 1);
+                    }
+                }
+            }
             foreach(KeyValuePair<string, int> kvp in dict){
                 string[] pairs = kvp.Key.Split(';');
                 string value1 = pairs[0];
@@ -92,27 +110,37 @@ namespace Practicum1_DAenR
                 int intersectAmount = kvp.Value;
                 int unionAmount = dict[value1 + ";" + value1 + ";" + table] + dict[value2 + ";" + value2 + ";" + table] - intersectAmount;
                 double jaccard = (double)intersectAmount / (double)unionAmount;
-
-                string query = "INSERT INTO workload" + table + " (value1, value2, jaccard) VALUES ('" + value1 + "','" + value2 + "'," + jaccard.ToString(CultureInfo.CreateSpecificCulture("en-GB")) + ")";
-                SQLiteCommand cmd = new SQLiteCommand(query, con);
-                cmd.ExecuteNonQuery();
+                string idQuery = "SELECT id FROM autompg WHERE " + table + " = '" + value2 + "'";
+                SQLiteCommand idCommand = new SQLiteCommand(idQuery, con);
+                SQLiteDataReader idReader = idCommand.ExecuteReader();
+                while (idReader.Read())
+                {
+                    int id =idReader.GetInt32(0);
+                    string query = "INSERT INTO workload" + table + " (value1, value2, id, jaccard) VALUES ('" + value1 + "','" + value2 + "'," + id + "," + jaccard.ToString(CultureInfo.CreateSpecificCulture("en-GB")) + ")";
+                    SQLiteCommand cmd = new SQLiteCommand(query, con);
+                    cmd.ExecuteNonQuery();
+                }
+                
                 // voeg hier aan de DB toe!
             }
 
         }
         private void makeQFColumn(string s)
         {
-            SQLiteCommand c = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s + "QF REAL", con);
-            c.ExecuteNonQuery();
+            SQLiteCommand cmd = new SQLiteCommand("ALTER TABLE autompg ADD COLUMN " + s + "QF REAL", con);
+            cmd.ExecuteNonQuery();
+            string indexQuery = "CREATE INDEX " + s + "QFindex ON autompg (" + s + "QF)";
+            cmd = new SQLiteCommand(indexQuery, con);
+            cmd.ExecuteNonQuery();
         }
         private void createWorkloadTables()
         {
             foreach (string column in tableLayout)
             {
-                string query = "CREATE TABLE workload" + column + " (value1 real, value2, jaccard real); ";
+                string query = "CREATE TABLE workload" + column + " (value1 text, value2 text, id, jaccard real); ";
                 SQLiteCommand cmd = new SQLiteCommand(query, con);
                 cmd.ExecuteNonQuery();
-                query = "CREATE INDEX " + column + "values ON workload" + column + " (value1 , value2)";
+                query = "CREATE INDEX " + column + "values ON workload" + column + " (value1 , jaccard)";
                 cmd = new SQLiteCommand(query, con);
                 cmd.ExecuteNonQuery();
             }

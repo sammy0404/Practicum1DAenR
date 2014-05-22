@@ -24,8 +24,43 @@ namespace QueryVerwerker
             }
             return vermenigvuldiging;
         }
+        public Dictionary<int,double> getNextOptions(){
+            Dictionary<int,double> lijstje = new Dictionary<int,double>();
+            foreach (Reciever rec in recieveList)
+            {
+                KeyValuePair<int, double> kvp = rec.nextValue();
+                double value = kvp.Value;
+                foreach (Reciever rec2 in recieveList)
+                {
+                    if (rec2 != rec)
+                    {
+                        value = rec2.getValueOf(kvp.Key);
+                    }
+                }
+                if(!lijstje.ContainsKey(kvp.Key))                    
+                    lijstje.Add(kvp.Key, value);
+            }
+            return lijstje;
+        }
+        public double getValueOf(int id)
+        {
+            double multiply = 1.0;
+            foreach (Reciever c in recieveList)
+            {
+                multiply *= c.getValueOf(id);
+            }
+            return multiply;
+        }
+        public double getLocalTreshold()
+        {
+            double multiply = 1.0;
+            foreach (Reciever c in recieveList)
+            {
+                multiply *= c.value();
+            }
+            return multiply;
+        }
     }
-
     public class NumEquality : Equality
     {
         public double val;
@@ -40,7 +75,6 @@ namespace QueryVerwerker
         }
         
     }
-
     public class CatEquality : Equality
     {
         public string val;
@@ -49,6 +83,7 @@ namespace QueryVerwerker
             con = c;
             attr = attribute;
             val = value;
+            recieveList.Add(new IDFReciever(attr, c));
             recieveList.Add(new QFREciever(attribute, c));
             recieveList.Add(new JaccardReciever(attr, val, c));
         }
@@ -62,15 +97,29 @@ namespace QueryVerwerker
         public Dictionary<int, double> lijst = new Dictionary<int, double>();
         public double value()
         {
-            return lijst.ElementAt(rank).Value;
+            try
+            {
+                return lijst.ElementAt(rank).Value;
+            }
+            catch (Exception e)
+            {
+                return 0.0;
+            }
         }
         public KeyValuePair<int, double> nextValue()
         {
-            KeyValuePair<int, double> a = lijst.ElementAt(rank);
-            rank++;
-            return a;
+            try
+            {
+                KeyValuePair<int, double> a = lijst.ElementAt(rank);
+                rank++;
+                return a;
+            }
+            catch (Exception e)
+            {
+                return new KeyValuePair<int,double>(lijst.ElementAt(0).Key, 0.0);
+            }
         }
-        public double getValueOf(int i)
+        public virtual double getValueOf(int i)
         {
             return lijst[i];
         }
@@ -164,16 +213,20 @@ namespace QueryVerwerker
     {
         public JaccardReciever(string attribute, string value, SQLiteConnection c)
         {
-            string query = "SELECT * FROM workload" + attribute + " WHERE value1 = " + value + " ORDER BY jaccard desc";
+            string query = "SELECT id, jaccard FROM workload" + attribute + " WHERE value1 = " + value + " ORDER BY jaccard desc";
             SQLiteCommand cmd = new SQLiteCommand(query, c);
             SQLiteDataReader reader = cmd.ExecuteReader();
-            List<double> list = new List<double>();
             while (reader.Read())
             {
-                double d = reader.GetDouble(2);
-                list.Add(d);
+                lijst.Add(reader.GetInt32(0), reader.GetDouble(1));
             }
-
+        }
+        public override double getValueOf(int i)
+        {
+            if (lijst.ContainsKey(i))
+                return lijst[i];
+            else
+                return 0.0;
         }
     }
     public class QFREciever : Reciever
