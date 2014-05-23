@@ -88,7 +88,7 @@ namespace QueryVerwerker
             SortedList<DoubleDing, int> lijst = new SortedList<DoubleDing, int>();
             Dictionary<int, double> dict = new Dictionary<int, double>();
             // duplicaten
-            while (lijst.Count <= k || lijst.ElementAt(lijst.Count-k).Key.d < treshold)
+            while ((lijst.Count <= k || lijst.ElementAt(lijst.Count-k).Key.d < treshold) && treshold > 0.0)
             {
                 Dictionary<int, double> iterationDict = nextIteration();
                 foreach (KeyValuePair<int, double> kvp in iterationDict)
@@ -99,14 +99,15 @@ namespace QueryVerwerker
                         dict.Add(kvp.Key, kvp.Value);
                     }
                 }
-
                 treshold = getGlobalTreshold();
-
             }
             List<int> ids = new List<int>();
-            for (int i = 0; i < k; i++)
+            int p = Math.Min(lijst.Count, k);
+            for (int i = 0; i < p; i++)
             {
-                ids.Add(lijst.ElementAt(lijst.Count - 1 - i).Value);
+                KeyValuePair<DoubleDing, int> kvp = lijst.ElementAt(lijst.Count - 1 - i);
+                if(kvp.Key.d != 0.0)
+                    ids.Add(kvp.Value);
             }
             
 

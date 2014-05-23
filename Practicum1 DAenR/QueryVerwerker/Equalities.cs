@@ -103,7 +103,7 @@ namespace QueryVerwerker
             }
             catch (Exception e)
             {
-                return 0.0;
+                return 0.0001;
             }
         }
         public KeyValuePair<int, double> nextValue()
@@ -226,7 +226,7 @@ namespace QueryVerwerker
             if (lijst.ContainsKey(i))
                 return lijst[i];
             else
-                return 0.0;
+                return 0.0001;
         }
     }
     public class QFREciever : Reciever
