@@ -17,7 +17,10 @@ namespace QueryVerwerker
         public Dictionary<string, bool> columns = new Dictionary<string, bool>();
         public QueryHandler(string s)
         {
-            con = new SQLiteConnection("Data Source=C:\\Users\\Gerben\\Documents\\GitHub\\Practicum1DAenR\\Practicum1 DAenR\\Practicum1 DAenR\\bin\\Debug\\cars.sqlite; Version=3;");
+             string source = System.Environment.CurrentDirectory;
+            string replaced = "Data Source=" + source.Replace("QueryVerwerker\\bin", "Practicum1 DAenR\\bin") + "\\cars.sqlite; Version=3;";
+            con = new SQLiteConnection(replaced);
+      //      con = new SQLiteConnection("Data Source=C:\\Users\\Gerben\\Documents\\GitHub\\Practicum1DAenR\\Practicum1 DAenR\\Practicum1 DAenR\\bin\\Debug\\cars.sqlite; Version=3;");
             //Data Source=C:\\Users\\Gebruiker\\Documents\\GitHub\\Practicum1DAenR\\Practicum1 DAenR\\Practicum1 DAenR\\bin\\Debug\\cars.sqlite; Version=3;
             con.Open();
             Dictionary<string, string> equalities = new Dictionary<string, string>();
